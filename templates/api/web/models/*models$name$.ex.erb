@@ -1,19 +1,17 @@
-defmodule <%= model.module_name %> do
+defmodule <%= model.module %> do
   use <%= module_name %>.Web, :model
 
-  @required_fields ~w(<%= model.attributes.select{|attr| attr.required } %>.join(" ") %>)
-  @optional_fields ~w(<%= model.attributes.select{|attr| !attr.required } %>.join(" ") %>)
+  @required_fields ~w(<%= model.attributes.select{|attr| attr.required }.map(&:name).join(" ") %>)
+  @optional_fields ~w(<%= model.attributes.select{|attr| !attr.required }.map(&:name).join(" ") %>)
 
   schema "<%= model.plural %>" do
-    <% model.attributes.each do |attr| %>
+<% model.attributes.each do |attr| -%>
     field :<%= attr.name %>, :<%= attr.type %>
-    <% end %>
-
-    <% model.relationships.each do |rel| %>
-    <% if rel.type == "one_to_many" %>has_many :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %><% end %>
-    <% if rel.type == "many_to_one" %>belongs_to :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %><% end %>
-    <% end %>
-
+<% end -%>
+<% model.relationships.each do |rel| -%>
+<% if rel.rel == "one_to_many" %>    has_many :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %><% end -%>
+<% if rel.rel == "many_to_one" %>    belongs_to :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %><% end -%>
+<% end %>
     timestamps inserted_at: :created_at
   end
 
@@ -28,13 +26,11 @@ defmodule <%= model.module_name %> do
 
   def delete!(<%= model.name %>) do
     <%= model.name %> = Repo.preload(<%= model.name %>, [<%= model.relationships.map{|rel| ":#{rel.name}"}.join(", ") %>])
-    
-    <% model.relationships.select{|rel| rel.type == "one_to_many"}.each do |rel| %>
+<% model.relationships.select{|rel| rel.type == "one_to_many"}.each do |rel| -%>
     for <%= rel.name %> <- <%= model.name %>.<%= rel.name %> do
-      <%= rel.module %>.delete!(<%= rel.name %>)
+      <%= model_for_type(rel.type).module %>.delete!(<%= rel.name %>)
     end
-    <% end %>
-
+<% end -%>
     Repo.delete(<%= model.name %>)
   end
 

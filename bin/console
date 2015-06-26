@@ -9,4 +9,4 @@ require "phoenix/generate"
 # (If you use this, don't forget to add pry to your Gemfile!)
 # require "pry"
 # Pry.start
-Phoenix::Generate.generate
+Phoenix::Generate.generate(File.expand_path(ARGV[0], Dir.pwd))

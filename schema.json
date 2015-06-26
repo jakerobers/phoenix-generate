@@ -1,0 +1,79 @@
+{
+  "name": "Docent",
+  "module_name": "DocentApi",
+  "project_slug": "docent_api",
+  "url": "www.docent.com",
+  "models": [
+    {
+      "name": "artist",
+      "type": "artist",
+      "plural": "artists",
+      "module": "Artist",
+      "attributes": [
+        {"name": "artsy_id", "type": "string"},
+        {"name": "name", "type": "string", "required": true}
+      ]
+    },
+    {
+      "name": "gallery",
+      "type": "gallery",
+      "plural": "galleries",
+      "module": "Gallery",
+      "attributes": [
+        {"name": "title", "type": "string", "required": true},
+        {"name": "address", "type": "string"}
+      ]
+    },
+    {
+      "name": "gene",
+      "type": "gene",
+      "plural": "genes",
+      "module": "Gene",
+      "attributes": [
+        {"name": "artsy_id", "type": "string", "required": true},
+        {"name": "title", "type": "string", "required": true},
+        {"name": "description", "type": "string"}
+      ]
+    },
+    {
+      "name": "user",
+      "type": "user",
+      "plural": "users",
+      "module": "User",
+      "attributes": [
+        {"name": "email", "required": true, "type": "string"},
+        {"name": "artsy_api_token", "type": "string"}
+      ]
+    },
+    {
+      "name": "floor",
+      "type": "floor",
+      "plural": "floors",
+      "module": "Floor",
+      "attributes": [
+        {"name": "title", "type": "string", "required": true},
+        {"name": "blueprint_url", "type": "string"},
+        {"name": "ordinality", "type": "integer"}
+      ],
+      "relationships": [
+        {"name": "gallery", "rel": "many_to_one", "fk": "gallery_id", "type": "gallery"}
+      ]
+    },
+    {
+      "name": "work",
+      "type": "work",
+      "plural": "works",
+      "module": "Work",
+      "attributes": [
+        {"name": "artsy_id", "type": "string"},
+        {"name": "title", "type": "string", "required": true},
+        {"name": "description", "type": "string"},
+        {"name": "display_image_url", "type": "string", "required": true},
+        {"name": "reference_image_url", "type": "string", "required": true}
+      ],
+      "relationships": [
+        {"name": "genes", "rel": "many_to_many", "fk": "gene_id", "type": "gene"}
+      ]
+    }
+  ]
+}

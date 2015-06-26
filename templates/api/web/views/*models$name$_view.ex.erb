@@ -12,7 +12,7 @@ defmodule <%= module_name %>.<%= model.module %>View do
       <% model.relationships.each do |relationship| %>
       <%= relationship.name %>: <%= module_name %>.<%= model_for_type(relationship.type).module %>View
       <% if !relationship.required %>optional: true<% end %>
-      <% end >
+      <% end %>
     }
   end
 
