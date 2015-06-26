@@ -1,0 +1,9 @@
+use Mix.Config
+
+config :<%= project_slug %>, <%= module_name %>.Endpoint,
+  http: [port: {:system, "PORT"}, compress: true],
+  url: [host: "<%= url %>"]
+
+config :logger, level: :info
+
+import_config "prod.secret.exs"

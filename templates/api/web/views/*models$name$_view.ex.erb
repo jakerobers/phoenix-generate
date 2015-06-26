@@ -1,0 +1,23 @@
+defmodule <%= module_name %>.<%= model.module %>View do
+  use <%= module_name %>.Web, :view
+
+  def type(), do: "<%= model.name %>"
+
+  def attributes(<%= model.name %>) do
+    Map.take(<%= model.name %>, [<%= model.attributes.map{|attr| ":#{attr.name}"}.join(",") %>])
+  end
+
+  def relationships() do
+    %{
+      <% model.relationships.each do |relationship| %>
+      <%= relationship.name %>: <%= module_name %>.<%= model_for_type(relationship.type).module %>View
+      <% if !relationship.required %>optional: true<% end %>
+      <% end >
+    }
+  end
+
+  def url_func() do
+    &<%= model.name %>_url/3
+  end
+
+end

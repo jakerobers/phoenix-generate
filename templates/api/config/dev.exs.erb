@@ -1,0 +1,13 @@
+use Mix.Config
+
+config :<%= project_slug %>, <%= module_name %>.Endpoint,
+  http: [port: 4000],
+  debug_errors: false,
+  code_reloader: true,
+  cache_static_lookup: false,
+  watchers: []
+
+config :<%= project_slug %>, <%= module_name %>.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  extensions: [{Extensions.JSON, library: Poison}],
+  database: "<%= project_slug %>_dev"

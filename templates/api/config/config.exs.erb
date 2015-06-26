@@ -1,0 +1,18 @@
+use Mix.Config
+
+config :<%= project_slug %>, <%= module_name %>.Endpoint,
+  url: [host: "localhost"],
+  root: Path.expand("..", __DIR__),
+  debug_errors: false,
+  pubsub: [name: <%= module_name %>.PubSub,
+           adapter: Phoenix.PubSub.PG2]
+
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id]
+
+config :joken,
+  secret_key: "<%= SecureRandom.urlsafe_base64(50) %>",
+  json_module: <%= module_name %>.JSON
+
+import_config "#{Mix.env}.exs"

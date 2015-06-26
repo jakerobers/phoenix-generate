@@ -1,0 +1,26 @@
+defmodule <%= module_name %>.SessionView do
+  use <%= module_name %>.Web, :view
+
+  def type, do: "session"
+
+  def attributes(data) do
+    %{
+      email: data.email,
+      auth_token: data.user.auth_token || <%= module_name %>.Authenticate.generate_token_for(data)
+    }
+  end
+
+  def relationships() do
+    <% unless model_for_type("user").nil? %>
+    %{
+      user: %{
+        view: <%= module_name %>.UserView
+      }
+    }
+    <% end %>
+  end
+
+  def url_func() do
+    &user_url/3
+  end
+end

@@ -1,0 +1,17 @@
+defmodule <%= module_name %> do
+  use Application
+
+  def start(_type, _args) do
+    import Supervisor.Spec, warn: false
+    children = [
+      supervisor(<%= module_name %>.Endpoint, []),
+      worker(<%= module_name %>.Repo, [])
+    ]
+    opts = [strategy: :one_for_one, name: <%= module_name %>.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+
+  def config_change(changed, _new, removed) do
+    <%= module_name %>.Endpoint.config_change(changed, removed)
+  end
+end

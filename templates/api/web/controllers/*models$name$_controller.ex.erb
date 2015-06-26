@@ -1,0 +1,82 @@
+defmodule <%= module_name %>.<%= model.name %>Controller do
+  use <%= module_name %>.Web, :controller
+
+  alias <%= module_name %>
+
+  plug Authenticate
+  plug ValidateFilters, [[], []] when action in [:index]
+  plug :scrub_params, "data" when action in [:create, :update]
+  plug :action
+
+  # GET /<%= model.plural %>
+  def index(conn, params) do
+    params = clean_params(params)
+    current_user = conn.assigns[:current_user]
+
+    query = from(p in <%= model.module %>)
+    |> JSONAPI.Query.add_query_paging(params)
+
+    <%= model.plural %> = Repo.all(query)
+    render conn, "index.json", %{data: <%= model.plural %>, params: params}
+  end
+
+  # GET /<%= model.plural %>/:id
+  def show(conn, %{"id" => id}) do
+    <%= model.name %> = get!(<%= model.name %>, id)
+    |> <%= model.module %>.preload!()
+
+    render conn, "show.json", data: <%= model.name %>
+  end
+
+  # POST /<%= model.plural %>
+  def create(conn, json=%{"format" => "json"}) do
+    current_user = conn.assigns[:current_user]
+    <%= model.name %>_json = Dict.get(json, "data", %{})
+
+    changeset = <%= model.module %>.changeset(%<%= model.module %>{}, <%= model.name %>_json)
+
+    if changeset.valid? do
+      <%= model.name %> = Repo.insert!(changeset)
+      <%= model.name %> = <%= model.module %>.preload!(<%= model.name %>)
+
+      conn
+      |> put_resp_header("Location", <%= model.name %>_path(conn, :show, <%= model.name %>.id))
+      |> put_status(201)
+      |> render "show.json", data: <%= model.name %>
+    else
+      put_status(conn, 400) |> render ChangsetView, "error.json", changeset: changeset
+    end
+  end
+
+  # PUT /<%= model.plural %>/:id
+  def update(conn, json=%{"format" => "json", "id" => id}) do
+    <%= model.name %> = get!(<%= model.module %>, id)
+    |> <%= model.module %>.preload!()
+
+    <%= model.name %>_json = Dict.get(json, "data", %{})
+
+    current_user = conn.assigns[:current_user]
+
+    changeset = <%= model.module %>.changeset(<%= model.name %>, <%= model.name %>_json)
+    if changeset.valid? do
+      <%= model.name %> = Repo.update!(changeset)
+      conn
+      |> put_status(200)
+      |> render "show.json", data: <%= model.name %>
+    else
+      put_status(conn, 400) |> render ChangsetView, "error.json", changeset: changeset
+    end
+  end
+
+  # DELETE /<%= model.plural %>/:id
+  def delete(conn, %{"format" => "json", "id" => id}) do
+    <%= model.name %> = get!(<%= model.name %>, id)
+    |> <%= model.module %>.preload!()
+
+    current_user = conn.assigns[:current_user]
+
+    <%= model.module %>.delete!(<%= model.name %>)
+
+    send_resp(conn, 204, "") |> halt
+  end
+end

@@ -1,0 +1,18 @@
+defmodule <%= module_name %>.Router do
+  use Phoenix.Router
+
+  pipeline :api do
+    plug JSONAPI.PlugResponseContentType
+  end
+
+  scope "/api", <%= module_name %> do
+    pipe_through :api
+    get       "/sessions", SessionController, :index
+    post      "/sessions", SessionController, :create
+    delete    "/sessions", SessionController, :delete
+    
+    <% models.each do |model| %>
+    resources "<%= model.plural %>", <%= model.module %>Controller, only: [:index, :show, :create, :update, :delete]
+    <% end %>
+  end
+end

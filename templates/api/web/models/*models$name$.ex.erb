@@ -1,0 +1,44 @@
+defmodule <%= model.module_name %> do
+  use <%= module_name %>.Web, :model
+
+  @required_fields ~w(<%= model.attributes.select{|attr| attr.required } %>.join(" ") %>)
+  @optional_fields ~w(<%= model.attributes.select{|attr| !attr.required } %>.join(" ") %>)
+
+  schema "<%= model.plural %>" do
+    <% model.attributes.each do |attr| %>
+    field :<%= attr.name %>, :<%= attr.type %>
+    <% end %>
+
+    <% model.relationships.each do |rel| %>
+    <% if rel.type == "one_to_many" %>has_many :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %><% end %>
+    <% if rel.type == "many_to_one" %>belongs_to :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %><% end %>
+    <% end %>
+
+    timestamps inserted_at: :created_at
+  end
+
+  def changeset(model, params \\ :empty) do
+    model
+    |> cast(params, @required_fields, @optional_fields)
+  end
+
+  def touch(<%= model.name %>) do
+    change(<%= model.name %>, []) |> Repo.update
+  end
+
+  def delete!(<%= model.name %>) do
+    <%= model.name %> = Repo.preload(<%= model.name %>, [<%= model.relationships.map{|rel| ":#{rel.name}"}.join(", ") %>])
+    
+    <% model.relationships.select{|rel| rel.type == "one_to_many"}.each do |rel| %>
+    for <%= rel.name %> <- <%= model.name %>.<%= rel.name %> do
+      <%= rel.module %>.delete!(<%= rel.name %>)
+    end
+    <% end %>
+
+    Repo.delete(<%= model.name %>)
+  end
+
+  def preload!(<%= model.name %>) do
+    Repo.preload(<%= model.name %>, [<%= model.relationships.map{|rel| ":#{rel.name}"}.join(", ") %>])
+  end
+end

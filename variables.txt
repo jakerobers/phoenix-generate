@@ -1,0 +1,17 @@
+project_slug = "comet_api"
+module_name = "CometApi"
+url = "www.comet.ai"
+
+models
+  {
+    "plural": "projects",
+    "module": "Project",
+    "attributes": [
+      {name: "title", type: "string", required: true}
+    ],
+    "relationships": [
+      {name: "owner", type: "user"},
+      {name: "users", type: "user"},
+      {name: "tags", type: "tag", required: false}
+    ]
+  }

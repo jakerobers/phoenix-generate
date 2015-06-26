@@ -1,0 +1,33 @@
+defmodule <%= module_name %>.Endpoint do
+  use Phoenix.Endpoint, otp_app: :<%= project_slug %>
+  import Phoenix.Controller, only: [accepts: 2]
+
+  plug Plug.Logger
+
+  if Mix.env == :dev || Mix.env == :test do
+    plug Corsica,
+      origins: ["*"],
+      allow_methods: ["HEAD", "GET", "POST", "PUT", "PATCH", "DELETE"],
+      allow_headers: ["Authorization", "Content-Type", "Accept", "Origin"]
+  end
+
+  if Mix.env == :prod do
+    plug Plug.SSL
+    plug Corsica,
+      origins: ["<%= url %>"],
+      allow_methods: ["HEAD", "GET", "POST", "PUT", "PATCH", "DELETE"],
+      allow_headers: ["Authorization", "Content-Type", "Accept", "Origin"]
+  end
+
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :multipart, :json],
+    pass: ["*/*"],
+    json_decoder: Poison
+
+  plug Plug.MethodOverride
+  plug Plug.Head
+
+
+  plug :accepts, ~w(json)
+  plug :router, <%= module_name %>.Router
+end
