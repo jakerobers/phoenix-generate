@@ -1,23 +1,69 @@
 defmodule <%= model.module %> do
   use <%= module_name %>.Web, :model
+  alias <%= module_name %>
 
   @required_fields ~w(<%= model.attributes.select{|attr| attr.required }.map(&:name).join(" ") %>)
   @optional_fields ~w(<%= model.attributes.select{|attr| !attr.required }.map(&:name).join(" ") %>)
 
   schema "<%= model.plural %>" do
 <% model.attributes.each do |attr| -%>
-    field :<%= attr.name %>, :<%= attr.type %>
+    field :<%= attr.name %>, :<%= attr.type %><% if attr.virtual %>, virtual: true<% end %>
 <% end -%>
 <% model.relationships.each do |rel| -%>
-<% if rel.rel == "one_to_many" %>    has_many :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %><% end -%>
-<% if rel.rel == "many_to_one" %>    belongs_to :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %><% end -%>
+<% if rel.rel == "one_to_many" %>    has_many :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %>
+<% end -%>
+<% if rel.rel == "many_to_one" %>    belongs_to :<%= rel.name %>, <%= model_for_type(rel.type).module %>, foreign_key: :<%= rel.fk %>
+<% end -%>
 <% end %>
     timestamps inserted_at: :created_at
   end
 
-  def changeset(model, params \\ :empty) do
+  def changeset(:create, model, params) do
     model
     |> cast(params, @required_fields, @optional_fields)
+<% if model.name == "user" -%>
+    |> validate_format(:email, ~r/@/)
+    |> update_change(:email, &String.downcase/1)
+    |> validate_unique(:email, on: Repo)
+    |> validate_length(:password, min: 6, too_short: "needs to be longer than 6 characters")
+<% end -%>
+  end
+
+  def changeset(:update, model, params) do
+    model
+    |> cast(params, [], @required_fields ++ @optional_fields)
+<% if model.name == "user" -%>
+    |> validate_format(:email, ~r/@/)
+    |> update_change(:email, &String.downcase/1)
+    |> validate_unique(:email, on: Repo)
+    |> validate_length(:password, min: 6, too_short: "needs to be longer than 6 characters")
+<% end -%>
+  end
+
+  def create(params) do
+    <%= model.name %>_changeset = changeset(:create, %<%= model.module %>{}, params)
+    if <%= model.name %>_changeset.valid? do
+<% if model.name == "user" -%>
+        <%= model.name %>_changeset = put_change(<%= model.name %>_changeset, :crypted_password, crypt(<%= model.name %>_changeset.changes[:password]))
+<% end -%>
+      {:ok, Repo.insert(<%= model.name %>_changeset)}
+    else
+      {:error, <%= model.name %>_changeset}
+    end
+  end
+
+  def update(<%= model.name %>, params) do
+    <%= model.name %>_changeset = changeset(:update, <%= model.name %>, params)
+    if <%= model.name %>_changeset.valid? do
+<% if model.name == "user" -%>
+      if Dict.has_key?(<%= model.name %>.changes, :password) do
+        <%= model.name %> = put_change(<%= model.name %>, :crypted_password, crypt(<%= model.name %>.changes[:password]))
+      end
+<% end -%>
+      {:ok, Repo.update(<%= model.name %>_changeset)}
+    else
+      {:error, <%= model.name %>_changeset}
+    end
   end
 
   def touch(<%= model.name %>) do
@@ -37,4 +83,35 @@ defmodule <%= model.module %> do
   def preload!(<%= model.name %>) do
     Repo.preload(<%= model.name %>, [<%= model.relationships.map{|rel| ":#{rel.name}"}.join(", ") %>])
   end
+<% if model.type == "user" -%>
+  def fetch(email) do
+    case find_by_email(email) do
+      [user] -> user
+      [] -> nil
+      _err -> raise "Two users with the same email"
+    end
+  end
+
+  def find_by_email(nil), do: []
+  def find_by_email(""), do: []
+  def find_by_email(email) do
+    Repo.all(from u in __MODULE__,
+      where: fragment("? = lower(?)", u.email, ^email),
+      limit: 1)
+  end
+
+  def crypt(nil), do: raise "You cannot encrypt an empty password."
+  def crypt(""), do: raise "You cannot encrypt an empty password."
+  def crypt(password) do
+    :erlpass.hash(password)
+  end
+
+  def password_check(_user, nil), do: false
+  def password_check(_user, ""), do: false
+  def password_check(nil, _password), do: false
+  def password_check(%__MODULE__{:crypted_password => nil}, _password), do: false
+  def password_check(%__MODULE__{:crypted_password=>crypted_password}, password) do
+    :erlpass.match(password, crypted_password)
+  end
+<% end -%>
 end

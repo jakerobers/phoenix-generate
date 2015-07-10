@@ -9,10 +9,12 @@ defmodule <%= module_name %>.<%= model.module %>View do
 
   def relationships() do
     %{
-      <% model.relationships.each do |relationship| %>
-      <%= relationship.name %>: <%= module_name %>.<%= model_for_type(relationship.type).module %>View
-      <% if !relationship.required %>optional: true<% end %>
-      <% end %>
+    <% model.relationships.each do |relationship| %>
+      <%= relationship.name %>: %{
+        view: <%= module_name %>.<%= model_for_type(relationship.type).module %>View,
+        <% if !relationship.required %>optional: true<% end %>
+      },
+    <% end %>
     }
   end
 

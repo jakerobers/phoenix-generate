@@ -1,6 +1,5 @@
 defmodule <%= module_name %>.ErrorView do
   use <%= module_name %>.Web, :view
-
   def render("404.html", _assigns) do
     "Page not found - 404"
   end
@@ -78,11 +77,11 @@ defmodule JSONAPI.ResourceNotFound do
   defexception plug_status: 404, message: "resource not found"
 end
 
-defmodule <%= module_name %>.Route.NotAuthenticated do
+defmodule CometApi.Route.NotAuthenticated do
   defexception plug_status: 401, message: "not authenticated to view"
 end
 
-defmodule <%= module_name %>.Route.Forbidden do
+defmodule CometApi.Route.Forbidden do
   defexception plug_status: 403, message: "not authenticated to view"
 end
 

@@ -46,20 +46,6 @@
       ]
     },
     {
-      "name": "floor",
-      "type": "floor",
-      "plural": "floors",
-      "module": "Floor",
-      "attributes": [
-        {"name": "title", "type": "string", "required": true},
-        {"name": "blueprint_url", "type": "string"},
-        {"name": "ordinality", "type": "integer"}
-      ],
-      "relationships": [
-        {"name": "gallery", "rel": "many_to_one", "fk": "gallery_id", "type": "gallery"}
-      ]
-    },
-    {
       "name": "work",
       "type": "work",
       "plural": "works",
@@ -72,7 +58,8 @@
         {"name": "reference_image_url", "type": "string", "required": true}
       ],
       "relationships": [
-        {"name": "genes", "rel": "many_to_many", "fk": "gene_id", "type": "gene"}
+        {"name": "genes", "rel": "many_to_many", "fk": "gene_id", "type": "gene"},
+        {"name": "artist", "rel": "many_to_one", "fk": "artist_id", "type": "artist"}
       ]
     }
   ]

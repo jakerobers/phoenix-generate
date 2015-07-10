@@ -1,0 +1,131 @@
+{
+  "name": "MarriedInMilwaukee",
+  "module_name": "MarriedInMilwaukee",
+  "project_slug": "married_in_milwaukee",
+  "url": "www.marriedinmilwaukee.com",
+  "models": [
+    {
+      "name": "user",
+      "type": "user",
+      "plural": "users",
+      "module": "User",
+      "attributes": [
+        {"name": "email", "type": "string", "required": true},
+        {"name": "password", "type": "string", "virtual": true, "required": true},
+        {"name": "crypted_password", "type": "string"},
+        {"name": "auth_token", "type": "string", "virtual": true}
+      ],
+      "relationships": [
+        {"name": "wedding_users", "rel": "one_to_many", "fk": "user_id", "type": "wedding_user" },
+        {"name": "vendor_users", "rel": "one_to_many", "fk": "user_id", "type": "vendor_user"}
+      ]
+    },
+    {
+      "name": "vendor",
+      "type": "vendor",
+      "plural": "vendors",
+      "module": "Vendor",
+      "attributes": [
+        {"name": "name", "type": "string", "required": true},
+        {"name": "address", "type": "string", "required": true},
+        {"name": "avatar", "type": "string"},
+        {"name": "cover_image", "type": "string"}
+      ],
+      "relationships": [
+        {"name": "vendor_users", "rel": "one_to_many", "fk": "user_id", "type": "vendor_user"},
+        {"name": "products", "rel": "one_to_many", "fk": "vendor_id", "type": "product"}
+      ]
+    },
+    {
+      "name": "wedding",
+      "type": "wedding",
+      "plural": "weddings",
+      "module": "Wedding",
+      "attributes": [
+        {"name": "date", "type": "datetime"}
+      ],
+      "relationships": [
+        {"name": "wedding_users", "rel": "one_to_many", "fk": "user_id", "type": "wedding_user" }
+      ]
+    },
+    {
+      "name": "category",
+      "type": "category",
+      "plural": "categories",
+      "module": "Category",
+      "attributes": [
+        {"name": "title", "type": "string"}
+      ]
+    },
+    {
+      "name": "product",
+      "type": "product",
+      "plural": "products",
+      "module": "Product",
+      "attributes": [
+        {"name": "name", "type": "string", "required": true},
+        {"name": "price", "type": "float"}
+      ],
+      "relationships": [
+        {"name": "vendor", "rel": "many_to_one", "fk": "vendor_id", "type": "vendor"},
+        {"name": "photos", "rel": "one_to_many", "fk": "product_id", "type": "photo"},
+        {"name": "category", "rel": "many_to_one", "fk": "category_id", "type": "category"}
+      ]
+    },
+    {
+      "name": "photo",
+      "type": "photo",
+      "plural": "photos",
+      "module": "Photo",
+      "attributes": [
+        {"name": "display_url", "type": "string", "required": true}
+      ],
+      "relationships": [
+        {"name": "product", "rel": "many_to_one", "fk": "product_id", "type": "product"}
+      ]
+    },
+    {
+      "name": "like",
+      "type": "like",
+      "plural": "likes",
+      "module": "Like",
+      "attributes": [
+        {"name": "value", "type": "boolean", "required": true}
+      ],
+      "relationships": [
+        {"name": "product", "rel": "many_to_one", "fk": "product_id", "type": "product"}
+      ]
+    },
+    {
+      "name": "wedding_user",
+      "type": "wedding_user",
+      "plural": "wedding_users",
+      "module": "WeddingUser",
+      "config": {"controller": false},
+      "relationships": [
+        {"name": "user", "rel": "many_to_one", "fk": "user_id", "type": "user"},
+        {"name": "wedding", "rel": "many_to_one", "fk": "wedding_id", "type": "wedding"}
+      ]
+    },
+    {
+      "name": "vendor_user",
+      "type": "vendor_user",
+      "plural": "vendor_users",
+      "module": "VendorUser",
+      "relationships": [
+        {"name": "user", "rel": "many_to_one", "fk": "user_id", "type": "user"},
+        {"name": "vendor", "rel": "many_to_one", "fk": "vendor_id", "type": "vendor"}
+      ]
+    },
+    {
+      "name": "product_photo",
+      "type": "product_photo",
+      "plural": "product_photos",
+      "module": "ProductPhoto",
+      "relationships": [
+        {"name": "product", "rel": "many_to_one", "fk": "product_id", "type": "product"},
+        {"name": "photo", "rel": "many_to_one", "fk": "photo_id", "type": "photo"}
+      ]
+    }
+  ]
+}

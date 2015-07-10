@@ -1,0 +1,12 @@
+{
+  "name": "Docent",
+  "module_name": "DocentApi",
+  "project_slug": "docent_api",
+  "url": "www.docent.com",
+  "models": [
+    {
+      "name": "user",
+      ""
+    }
+  ]
+}

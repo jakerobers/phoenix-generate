@@ -1,0 +1,27 @@
+defmodule <%= module_name %>.Repo.Migrations.Create<%= model.module %> do
+  use Ecto.Migration
+
+  def change do
+    create table(:<%= model.plural %>) do
+<% model.attributes.each do |attr| -%>
+      add :<%= attr.name %>, :<%= attr.type %>
+<% end -%>
+<% model.relationships.each do |rel| -%>
+<% if rel.rel == "many_to_one" %>      add :<%= rel.fk %>, references(:<%= model_for_type(rel.type).plural %>)
+<% end -%>
+<% end -%>
+      add :created_at, :datetime, null: false
+      add :updated_at, :datetime, null: false
+    end
+<% model.relationships.select{|rel| rel.rel == "many_to_many"}.each do |rel| -%>
+<% other_relationship = model_for_type(rel.type).relationships.select{|re| re.through == rel.through }.first -%>
+<% other_model = model_for_type(rel.type) -%>
+<% if other_model.index < model.index %>
+    create table(:<%= rel.through %>) do
+      add :<%= rel.fk %>, references(:<%= model_for_type(rel.type).plural %>)
+      add :<%= other_relationship.fk %>, references(:<%= model_for_type(other_relationship.type).plural %>)
+    end
+<% end -%>
+<% end -%>
+  end
+end

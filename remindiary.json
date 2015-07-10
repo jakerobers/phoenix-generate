@@ -1,0 +1,28 @@
+{
+  "name": "Remindiary",
+  "module_name": "RemindiaryApi",
+  "project_slug": "remindiary_api",
+  "url": "www.remindiary.co",
+  "models": [
+    {
+      "name": "user",
+      "type": "user",
+      "plural": "users",
+      "module": "User",
+      "attributes": [
+        {"name": "email", "required": true, "type": "string"},
+        {"name": "password", "type": "string"},
+        {"name": "access_token", "type": "string"}
+      ]
+    },
+    {
+      "name": "task",
+      "type": "task",
+      "plural": "tasks",
+      "module": "Task",
+      "attributes": [
+        {"name": "title", }
+      ]
+    }
+  ]
+}
