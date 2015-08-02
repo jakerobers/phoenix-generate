@@ -1,0 +1,117 @@
+{
+  "name": "GymOClock",
+  "module_name": "GymOClock",
+  "project_slug": "gym_o_clock",
+  "url": "www.gym-clock.com",
+  "models": [
+    {
+      "name": "user",
+      "type": "user",
+      "plural": "users",
+      "module": "User",
+      "attributes": [
+        {"name": "email", "type": "string", "required": true},
+        {"name": "username", "type": "string", "required": true},
+        {"name": "name", "type": "string", "required": true},
+        {"name": "bio", "type": "string", "required": true},
+        {"name": "password", "type": "string", "virtual": true, "required": true},
+        {"name": "crypted_password", "type": "string"},
+        {"name": "auth_token", "type": "string", "virtual": true}
+      ],
+      "relationships": [
+        {"name": "exercises", "rel": "one_to_many", "fk": "exercise_id", "type": "exercise"},
+        {"name": "workouts", "rel": "one_to_many", "fk": "workout_id", "type": "workout"}
+      ]
+    },
+    {
+      "name": "workout",
+      "type": "workout",
+      "plural": "workouts",
+      "module": "Workouts",
+      "attributes": [
+        {"name": "name", "type": "string", "required": true},
+        {"name": "description", "type": "string"},
+        {"name": "is_template", "type": "boolean"},
+        {"name": "is_public", "type": "boolean"}
+      ],
+      "relationships": [
+        {"name": "user", "rel": "many_to_one", "fk": "user_id", "type": "user"},
+        {"name": "workout_sets", "rel": "one_to_many", "fk": "workout_sets_id", "type": "workout_set"}
+      ]
+    },
+    {
+      "name": "workout_set",
+      "type": "workout_set",
+      "plural": "workout_sets",
+      "module": "WorkoutSets",
+      "attributes": [
+        {"name": "index", "type": "integer", "required": true},
+        {"name": "notes", "type": "string"},
+        {"name": "feeling", "type": "integer"}
+      ],
+      "relationships": [
+        {"name": "workout", "rel": "many_to_one", "fk": "workout_id", "type": "workout"},
+        {"name": "set_exercises", "rel": "one_to_many", "fk": "set_exercise_id", "type": "set_exercises"}
+      ]
+    },
+    {
+      "name": "set_exercise",
+      "type": "set_exercise",
+      "plural": "set_exercises",
+      "module": "SetExercise",
+      "attributes": [
+        {"name": "notes", "type": "string"},
+        {"name": "index", "type": "integer"},
+        {"name": "feeling", "type": "integer"},
+        {"name": "reps", "type": "float"},
+        {"name": "value", "type": "float"},
+        {"name": "unit", "type": "string"}
+      ],
+      "relationships": [
+        {"name": "workout_set", "rel": "many_to_one", "fk": "workout_set_id", "type": "workout_set"},
+        {"name": "exercise", "rel": "many_to_one", "fk": "exercise_id", "type": "exercise"}
+      ]
+    },
+    {
+      "name": "media",
+      "type": "media",
+      "plural": "medias",
+      "module": "Media",
+      "attributes": [
+        {"name": "original", "type": "string"},
+        {"name": "type", "type": "string"},
+        {"name": "xsmall", "type": "string"},
+        {"name": "small", "type": "string"},
+        {"name": "medium", "type": "string"},
+        {"name": "large", "type": "string"}
+      ],
+      "relationships": [
+        {"name": "user", "rel": "one_to_one", "fk": "user_id", "type": "user"}
+      ]
+    },
+    {
+      "name": "exercise",
+      "type": "exercise",
+      "plural": "exercises",
+      "module": "Exercise",
+      "attributes": [
+        {"name": "name", "type": "string", "required": true},
+        {"name": "description", "type": "string"}
+      ],
+      "relationships": [
+        {"name": "user", "rel": "many_to_one", "fk": "user_id", "type": "user"},
+        {"name": "exercise_media", "rel": "one_to_many", "fk": "exercise_media_id", "type": "exercise_media"}
+      ]
+    },
+    {
+      "name": "exercise_media",
+      "type": "exercise_media",
+      "plural": "exercise_medias",
+      "module": "ExerciseMedia",
+      "relationships": [
+        {"name": "exercise", "rel": "one_to_one", "fk": "exercise_id", "type": "exercise"},
+        {"name": "media", "rel": "one_to_one", "fk": "media_id", "type": "media"}
+      ]
+    }
+  ]
+}
